@@ -1,0 +1,40 @@
+struct PsIn {
+	float4 position: SV_Position;
+	float2 texCoord: TexCoord;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	Out.position.x = (VertexID == 2)?  3.0 : -1.0;
+	Out.position.y = (VertexID == 0)? -3.0 :  1.0;
+	Out.position.zw = 1.0;
+
+	Out.texCoord.x = (Out.position.x+1)/2.0f;
+	Out.texCoord.y = -(Out.position.y-1)/2.0f;
+
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D color;
+Texture2D decal;
+SamplerState filter;
+
+float3 edgeColor;
+
+float4 main(PsIn In) : SV_Target {
+
+	float3 color = color.Sample(filter, In.texCoord.xy).xyz;
+	float decal = decal.Sample(filter, In.texCoord.xy);
+
+	//Replace the background color (just for the demo)
+	if (dot(color,color) == 0.0)
+		return float4(0.2f, 0.2f, 0.4f, 1.0f);
+	
+	return float4(color*(1.0f-decal) + decal*edgeColor, 1.0);
+}

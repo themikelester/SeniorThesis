@@ -1,0 +1,149 @@
+struct GsIn {
+	float3 vertPos: Position;
+	float3 orient: BiNorm;
+	float  radius: Radius;
+	float3 norm: Normal;
+	float  att: Attenuation;
+};
+
+struct PsIn {
+	float4	pos:	SV_Position;
+	float2	edge:	Edge;
+	float3	norm:	Normal;
+	float	att:	Attenuation;
+};
+
+float4x4 mvp;
+float3 eyePos;
+float graftalScale;
+
+[Vertex shader]
+
+GsIn main(float3 geometryVert: Position1, GraftalFormat graftal, uint VertexID: SV_VertexID, uint InstanceID: SV_InstanceID ){
+	GsIn Out;
+	
+	// Scale the color to blend in the lines
+	float visPoint = 0.5f;
+	float threshold = 0.1f;
+	float alphaScale = saturate(1.0f - abs(visPoint - graftal.P)/threshold); //[0-1]
+	
+	//Scale the graftal...
+	geometryVert *= graftalScale *0.5;
+
+	//Pass the graftal's "size" on to the rest of the pipeline (we'll use it in the pixel shader)
+	Out.att = alphaScale;
+
+	//The graftal radius at each spline vertex is stored in the z channel
+	//Because this is the 2nd LOD level, shrink the rib size to make a skinny triangle
+	float  ribSize = geometryVert.z * 0.8;
+	float3 vertPos = float3(geometryVert.xy, 0);
+
+	float3 graftalPos = graftal.pos;
+	float3 eyeVec = normalize(eyePos - graftalPos);
+
+	//Construct the graftal's local coordinate frame using two vectors: 
+	//Np, the surface normal (at point p)
+	//X,  the orientation vector that defines the direction the graftal is facing 	 
+	float3 normal = normalize(graftal.norm);
+	float3 tangent = cross(normal, eyeVec);
+	float3 binorm = cross(normal, tangent);
+
+	float3x3 GraftalFrame = float3x3(	
+    		tangent.x, normal.x, binorm.x,
+			tangent.y, normal.y, binorm.y,
+			tangent.z, normal.z, binorm.z
+	); 
+
+	Out.vertPos = mul(GraftalFrame, vertPos) + graftalPos;
+	Out.orient = binorm;
+	Out.radius = ribSize;
+	Out.norm = normal;
+
+	return Out;
+}
+
+[Geometry shader]
+//TODO: Implement Instance Culling
+
+[maxvertexcount(4)]
+void main(lineadj GsIn In[4], inout TriangleStream<PsIn> Stream, uint primID: SV_PrimitiveID){
+	PsIn v0, v1, v2, v3;
+
+	// Compute orientation vectors for the two connecting faces:
+	float3 p0, p1, p2, p3;
+	p0 = In[0].vertPos;	p1 = In[1].vertPos;
+	p2 = In[2].vertPos;	p3 = In[3].vertPos;
+	float3 n0 = normalize(p1-p0);
+	float3 n1 = normalize(p2-p1);
+	float3 n2 = normalize(p3-p2);
+	float3 u  = normalize(n0+n1);
+	float3 v  = normalize(n1+n2);
+
+	//This can be varied to customize graftals
+	float rad0 = In[1].radius;
+	float rad1 = In[2].radius;
+
+	//Calculate the ribs
+	float3 orient = In[1].orient;
+	float3 r0 = cross(u, orient) * rad0;
+	float3 r1 = cross(v, orient) * rad1;
+
+	v0.pos = mul(mvp, float4(p1 - r0, 1)); 
+	v1.pos = mul(mvp, float4(p1 + r0, 1));
+	v2.pos = mul(mvp, float4(p2 - r1, 1)); 
+	v3.pos = mul(mvp, float4(p2 + r1, 1));
+
+	// X channel stores distance to the right edge
+	// Y channel stored distance to the left edge
+	v0.edge = float2(rad0, 0);
+	v1.edge = float2(0, rad0);
+	v2.edge = float2(rad1, 0);
+	v3.edge = float2(0, rad1);
+	
+	v0.norm = In[1].norm;
+	v1.norm = In[1].norm;
+	v2.norm = In[1].norm;
+	v3.norm = In[1].norm;
+
+	v0.att = In[0].att;
+	v1.att = In[1].att;
+	v2.att = In[2].att;
+	v3.att = In[3].att;
+
+	Stream.Append(v0);	
+	Stream.Append(v1);
+	Stream.Append(v2);	
+	Stream.Append(v3);
+}
+
+[Fragment shader]
+
+float3 lineColor;
+float3 solidColor;
+float3 lightDir;
+
+float4 main(PsIn In) : SV_Target {
+	
+	float2 ddEdge = fwidth(In.edge);
+	float edgeDist = min(In.edge.x, In.edge.y);
+	float constWidth = min(ddEdge.x, ddEdge.y);
+
+	float edgeWidth = 2.0f;
+	float lineSmooth = constWidth;
+
+	float edgeThreshold = constWidth * edgeWidth;
+	float edgeSelect = smoothstep(edgeThreshold-lineSmooth, edgeThreshold+lineSmooth, edgeDist);
+
+	//Calculate the shaded color
+	float3 diffuse = dot(In.norm, lightDir);
+	float3 ambient = 0.2f;
+	float3 shade = step(0.9, diffuse) + step(0.5, diffuse)*0.7;
+	solidColor = float4(shade, 1.0);
+	solidColor = float4(0xFF/255.0, 0x78/255.0, 0, 1);
+
+	//Blend the line color with the solid color based on the graftals "size" factor
+	lineColor = lerp(solidColor, 1.0f, In.att);
+
+	float3 color = lerp(lineColor, solidColor, edgeSelect);
+	return float4(color, smoothstep(0, constWidth, edgeDist));
+}

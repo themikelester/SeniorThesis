@@ -1,0 +1,88 @@
+struct GsIn {
+	float3 vertPos: Position;
+	float3 orient: Normal;
+	float  radius: Radius;
+	float  vis: Vis;
+	float3 color: Color;
+};
+
+struct PsIn {
+	float4	pos:	SV_Position;
+	float	vis:	Vis;
+	float3	color: Color;
+};
+
+float4x4 mvp;
+float3 eyePos;
+float scale;
+float graftalScale;
+
+[Vertex shader]
+
+GsIn main(float3 graftalVert: Position0, float3 instancePos: Position1, float3 instanceNorm: Normal, uint VertexID: SV_VertexID, uint InstanceID: SV_InstanceID ){
+	GsIn Out;
+	
+	//Scale the graftal...
+	graftalVert *= graftalScale;
+
+	//The graftal radius at each spline vertex is stored in the z channel
+	float  ribSize = graftalVert.z;
+	float3 vertPos = float3(graftalVert.xy, 0);
+
+	float3 graftalPos = instancePos*scale;
+	float3 eyeVec = normalize(eyePos - graftalPos);
+
+	//Construct the graftal's local coordinate frame using two vectors: 
+	//Np, the surface normal (at point p)
+	//X,  the orientation vector that defines the direction the graftal is facing 	 
+	float3 normal = normalize(instanceNorm);
+	float3 tangent = cross(normal, eyeVec);
+	float3 binorm = cross(normal, tangent);
+
+	float3x3 GraftalFrame = float3x3(	
+    		tangent.x, normal.x, binorm.x,
+			tangent.y, normal.y, binorm.y,
+			tangent.z, normal.z, binorm.z
+	); 
+
+	Out.vertPos = mul(GraftalFrame, vertPos) + graftalPos;
+	Out.orient = binorm;
+	Out.radius = ribSize;
+	Out.vis = dot(normal, eyeVec);
+	Out.color = eyeVec;
+
+	return Out;
+}
+
+[Geometry shader]
+//TODO: Implement Instance Culling
+
+[maxvertexcount(2)]
+void main(lineadj GsIn In[4], inout LineStream<PsIn> Stream, uint primID: SV_PrimitiveID){
+	PsIn v0, v1;
+
+	// Compute orientation vectors for the two connecting faces:
+	float3 p0, p1;
+	p0 = In[1].vertPos;	p1 = In[2].vertPos;
+
+	v0.pos = mul(mvp, float4(p1, 1)); 
+	v1.pos = mul(mvp, float4(p1, 1));
+
+	v0.color = float3(0,0,0);
+	v1.color = v0.color;
+
+	v0.vis = v1.vis = In[1].vis;
+
+	Stream.Append(v0);	
+	Stream.Append(v1);
+}
+
+[Fragment shader]
+
+float3 lineColor;
+float3 solidColor;
+
+float4 main(PsIn In) : SV_Target {
+
+	return float4(In.color,1);
+}

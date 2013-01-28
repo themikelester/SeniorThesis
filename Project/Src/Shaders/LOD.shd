@@ -1,0 +1,18 @@
+[Vertex shader]
+GraftalFormat main(GraftalFormat graftal) {
+	return graftal;
+}
+
+[Geometry shader]
+
+[maxvertexcount(1)]
+void main(point GraftalFormat In[1], inout PointStream<GraftalFormat> Stream){
+#ifdef LOD1
+	if(In[0].P >= 0.4)
+#else
+	if(In[0].P < 0.4f || In[0].P > 0.6f)
+#endif
+		return;
+	
+	Stream.Append(In[0]);
+}

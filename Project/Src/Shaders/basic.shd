@@ -1,0 +1,33 @@
+struct PsIn {
+	float4 position: SV_Position;
+	float3 normal: Normal;
+};
+
+[Vertex shader]
+
+float4x4 mvp;
+float scale;
+
+PsIn main(float3 pos: Position0, float3 norm: Normal0 ){
+	PsIn Out;
+
+	Out.position = mul(mvp, float4(pos*scale, 1.0));
+	Out.normal = norm;
+
+	return Out;
+}
+
+[Fragment shader]
+float3 lightDir;
+
+float4 main(PsIn In) : SV_Target {
+	/*
+		This should really be resampled to a cubemap at load time instead, but I'm lazy ...
+	*/
+	float3 diffuse = dot(In.normal, lightDir);
+	float3 ambient = 0.2f;
+
+	float3 color = step(0.9, diffuse) + step(0.5, diffuse)*0.7;
+
+	return float4(0xFF/255.0, 0x78/255.0, 0, 1);
+}

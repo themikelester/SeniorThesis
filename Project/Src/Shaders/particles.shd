@@ -1,0 +1,112 @@
+
+struct GsIn {
+	float4 position: SV_Position;
+	float2 size: Size;
+	float time: Time;
+	float angle: Angle;
+};
+
+struct PsIn {
+	float4 position: SV_Position;
+	float3 texCoord: TexCoord;
+};
+
+[Vertex shader]
+
+Texture2D terrain;
+SamplerState filter;
+
+float4x4 mvp;
+float2 size;
+float time;
+
+GsIn main(uint VertexID: SV_VertexID, uint InstanceID: SV_InstanceID){
+	GsIn Out;
+
+	float s0 = float(VertexID);
+	float s1 = float(InstanceID);
+	float b = (VertexID & 1)? 1 : -1;
+
+	// Make each instance's animation unique
+	time += s1;
+
+	// Randomize y from VertexID and angle and animate with time
+	float y = 0;
+	float a = frac(s0 * 0.9178592 + time * 0.18947) * b * 6.2831853;
+
+	// Randomize x and y from InstanceID
+	float x = frac(s1 * s1 * 0.23764076) * 192.0 - 96.0;
+	float z = frac(s1 * s1 * 0.72117652) * 192.0 - 96.0;
+
+	// Randomize particle size with InstanceID
+	float s = frac(s1 * 0.81029572) * 0.6 + 0.4;
+
+	// Randomize fire height with InstanceID
+	float h = (frac(s1 * 0.60178237) * 8.0 + 8.0) * s;
+
+	// Wobble in x and z
+	float w = y * y * y * (frac(s1 * 0.4195827) + 0.5);
+	x += 0.03 * y * h * cos(w * 4.2058 + 2.1975 * time);
+	z += 0.03 * y * h * sin(w * 4.9182 + 3.7345 * time);
+
+	float offset = terrain.SampleLevel(filter, float2(x, z) * (1.0 / 256.0) + 0.5, 0);
+
+	float4 position = float4(x, h * y * y + 50.0 * offset, z, 1);
+
+	Out.position = mul(mvp, position);
+	Out.size = s * size;
+	Out.time = y;
+	Out.angle = a;
+
+	return Out;
+}
+
+[Geometry shader]
+
+[maxvertexcount(3)]
+void main(point GsIn In[1], inout TriangleStream<PsIn> Stream){
+	PsIn Out;
+
+	const float2 offsets[4] = {
+		float2(-1,  1),
+		float2( 1,  1),
+		float2(-1, -1),
+		float2( 1, -1),
+	};
+
+	const float2 simple[3] = {
+		float2(-1, 0),
+		float2(1, 0),
+		float2(0, 8),
+	};
+
+	float cosA = cos(In[0].angle);
+	float sinA = sin(In[0].angle);
+
+	// Expand to rotated quad in screen-space
+	[unroll]
+	for (uint i = 0; i < 3; i++){
+		Out.position = In[0].position;
+
+		//float2 p = float2(cosA * offsets[i].x - sinA * offsets[i].y, sinA * offsets[i].x + cosA * offsets[i].y);
+		float2 p = simple[i];
+
+		Out.position.xy += p * 0.5 * In[0].size;
+		Out.texCoord.xy = offsets[i] * 0.5 + 0.5;
+		Out.texCoord.z = In[0].time;
+
+		Stream.Append(Out);
+	}
+//	Stream.RestartStrip();
+}
+
+
+[Fragment shader]
+
+Texture3D tex;
+SamplerState filter;
+
+float4 main(PsIn In) : SV_Target {
+	return float4(float3(110, 163, 41)/255, 1.0);
+	//return tex.Sample(filter, In.texCoord) * In.texCoord.z;
+}

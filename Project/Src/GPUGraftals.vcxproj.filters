@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="..\Framework3\Direct3D10\D3D10App.cpp">
+      <Filter>Framework\Direct3D10</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Direct3D10\Direct3D10Renderer.cpp">
+      <Filter>Framework\Direct3D10</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Imaging\Image.cpp">
+      <Filter>Framework\Imaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Button.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\CheckBox.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Dialog.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\DropDownList.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Label.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Widget.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Slider.cpp">
+      <Filter>Framework\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Math\Vector.cpp">
+      <Filter>Framework\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Math\Noise.cpp">
+      <Filter>Framework\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\BSP.cpp">
+      <Filter>Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\Model.cpp">
+      <Filter>Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\String.cpp">
+      <Filter>Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\TexturePacker.cpp">
+      <Filter>Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\Tokenizer.cpp">
+      <Filter>Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Windows\WindowsBase.cpp">
+      <Filter>Framework\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\CPU.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Config.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\BaseApp.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Platform.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Renderer.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Bunny.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="..\Framework3\Direct3D10\D3D10App.h">
+      <Filter>Framework\Direct3D10</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Direct3D10\Direct3D10Renderer.h">
+      <Filter>Framework\Direct3D10</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Imaging\Image.h">
+      <Filter>Framework\Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Button.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\CheckBox.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Dialog.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\DropDownList.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Label.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Widget.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Slider.h">
+      <Filter>Framework\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Math\Vector.h">
+      <Filter>Framework\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Math\Noise.h">
+      <Filter>Framework\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\BSP.h">
+      <Filter>Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\Model.h">
+      <Filter>Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\String.h">
+      <Filter>Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\TexturePacker.h">
+      <Filter>Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\Tokenizer.h">
+      <Filter>Framework\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\CPU.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Config.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\BaseApp.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Platform.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Renderer.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Bunny.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="basic.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="GPUGraftals.exe">
+      <Filter>Executables</Filter>
+    </None>
+    <None Include="graftalDebug.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="initial.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="cull.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="PosVis.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Common.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="terrain.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="FSQuad.shd">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="lines.shd">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{c9010812-356a-460c-8d53-f2d8aeeb9fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Direct3D10">
+      <UniqueIdentifier>{14c567f0-e1c2-4127-8308-e4e1e96b7593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Imaging">
+      <UniqueIdentifier>{2fbb07d7-b574-4c3a-91c4-4e0be4129ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\GUI">
+      <UniqueIdentifier>{b7994ea0-8128-4034-9f24-dff2ba8a4a1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Math">
+      <UniqueIdentifier>{e368a312-9b8d-4193-9631-865a44cc5a38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Util">
+      <UniqueIdentifier>{f8e7dff8-de27-425d-98b3-a56d2d6d0e01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Windows">
+      <UniqueIdentifier>{7b45e88f-6ca0-47c2-8b87-8a8a92687736}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{4aa2d757-fcba-4b04-a269-d662cbab5f47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{174b618d-a0ce-4958-8179-bf3d3c82abe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Executables">
+      <UniqueIdentifier>{c7fd735b-c821-4630-89af-0ee86ea41c2d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Framework3\Windows\Resources.rc">
+      <Filter>Framework\Windows</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="graftal.shd">
+      <Filter>Shaders</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,38 @@
+
+struct PsIn {
+	float4 position: SV_Position;
+	float3 texCoord: TexCoord;
+};
+
+[Vertex shader]
+
+float4x4 invMvp;
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0 : -1.0;
+	position.y = (VertexID == 2)? 3.0 : -1.0;
+	position.zw = 1.0;
+
+	Out.position = position;
+	Out.texCoord = mul(invMvp, position);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+TextureCube env;
+SamplerState filter;
+
+float4 main(PsIn In) : SV_Target {
+	float4 color = env.Sample(filter, In.texCoord);
+	// Make it less purple
+	//color.b *= 0.2;
+
+	return color;
+}

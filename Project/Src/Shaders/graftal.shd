@@ -1,0 +1,130 @@
+struct GsIn {
+	float3 vertPos:	Position;
+	float3 orient:	BiNorm;
+	float  radius:	Radius;
+	float  P:		Visibility;
+};
+
+struct PsIn {
+	float4	pos:	SV_Position;
+	float2	edge:	Edge;
+	float	P:		Visibility;
+};
+
+float4x4 mvp;
+float3 eyePos;
+float graftalScale;
+
+[Vertex shader]
+
+GsIn main(float3 geometryVert: Position1, GraftalFormat graftal, uint VertexID: SV_VertexID, uint InstanceID: SV_InstanceID ){
+	GsIn Out;
+
+	// Scale the graftal based on it's visibility
+	float threshold = 0.7;
+	float visScale = saturate(1.0-(abs(graftal.P)/threshold));
+	
+	//Scale the graftal...
+	geometryVert *= graftalScale * graftal.size * visScale;
+
+	//The graftal radius at each spline vertex is stored in the z channel
+	float  ribSize = geometryVert.z;
+	float3 vertPos = float3(geometryVert.xy, 0);
+
+	float3 eyeVec = normalize(eyePos - graftal.pos);
+
+	//Construct the graftal's local coordinate frame using two vectors: 
+	//Np, the surface normal (at point p)
+	//X,  the orientation vector that defines the direction the graftal is facing 	 
+	float3 normal = graftal.norm;
+	float3 tangent = cross(normal, eyeVec);
+	float3 binorm = cross(normal, tangent);
+
+	float3x3 GraftalFrame = float3x3(	
+    		tangent.x, normal.x, binorm.x,
+			tangent.y, normal.y, binorm.y,
+			tangent.z, normal.z, binorm.z
+	); 
+
+	Out.vertPos = mul(GraftalFrame, vertPos) + graftal.pos;
+	Out.radius = ribSize;
+	Out.orient = binorm;
+	Out.P = graftal.P;
+
+	return Out;
+}
+
+[Geometry shader]
+[maxvertexcount(4)]
+void main(lineadj GsIn In[4], inout TriangleStream<PsIn> Stream, uint primID: SV_PrimitiveID){
+	PsIn v0, v1, v2, v3;
+
+	// Compute orientation vectors for the two connecting faces:
+	float3 p0, p1, p2, p3;
+	p0 = In[0].vertPos;	p1 = In[1].vertPos;
+	p2 = In[2].vertPos;	p3 = In[3].vertPos;
+	float3 u  = normalize(p2-p0);
+	float3 v  = normalize(p3-p1);
+
+	//This can be varied to customize graftals
+	float rad0 = In[1].radius;
+	float rad1 = In[2].radius;
+
+	//Calculate the ribs
+	float3 orient = In[1].orient;
+	float3 r0 = cross(u, orient) * rad0;
+	float3 r1 = cross(v, orient) * rad1;
+
+	v0.pos = mul(mvp, float4(p1 - r0, 1)); 
+	v1.pos = mul(mvp, float4(p1 + r0, 1));
+	v2.pos = mul(mvp, float4(p2 - r1, 1)); 
+	v3.pos = mul(mvp, float4(p2 + r1, 1));
+
+	// X channel stores distance to the right edge
+	// Y channel stored distance to the left edge
+	v0.edge = float2(rad0, 0);
+	v1.edge = float2(0, rad0);
+	v2.edge = float2(rad1, 0);
+	v3.edge = float2(0, rad1);
+
+	v0.P = In[1].P;
+	v1.P = In[1].P;
+	v2.P = In[1].P;
+	v3.P = In[1].P;
+
+	Stream.Append(v0);	
+	Stream.Append(v1);
+	Stream.Append(v2);	
+	Stream.Append(v3);
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color:	SV_Target0;
+	float4 decal:	SV_Target1;
+};
+
+float3 lineColor;
+float3 solidColor;
+float3 lightDir;
+
+PsOut main(PsIn In) {
+	
+	PsOut Out;
+	
+	float2 ddEdge = fwidth(In.edge);
+	float edgeDist = min(In.edge.x, In.edge.y);
+	float constWidth = min(ddEdge.x, ddEdge.y);
+
+	float edgeWidth = 1.0f;
+	float edgeThreshold = constWidth * edgeWidth;
+	
+	float dist = saturate(abs(edgeThreshold - edgeDist)/edgeThreshold);
+	
+	Out.decal = (1.0f - dist) * pow((1.0f-In.P),2);
+	Out.color = float4(solidColor, 1.0f);
+
+	return Out;
+}
+

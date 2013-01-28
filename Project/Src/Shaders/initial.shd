@@ -1,0 +1,60 @@
+#define M_PI 3.141592654
+
+struct ModelFormat {
+	float3 pos: Position0;
+	float3 norm: Normal0;
+};
+
+[Vertex shader]
+
+float4x4 mvp;
+float scale;
+
+ModelFormat main(ModelFormat model){
+
+	return model;
+}
+
+[Geometry shader]
+
+float2 rand(float2 seed)
+{
+  const float4 a=float4(M_PI * M_PI * M_PI * M_PI, exp(4.0), pow(13.0, M_PI / 2.0), sqrt(1997.0));
+  float4 result =float4(seed,seed);
+
+  for(int i = 0; i < 3; i++) 
+  {
+      result.x = frac(dot(result, a));
+      result.y = frac(dot(result, a));
+      result.z = frac(dot(result, a));
+      result.w = frac(dot(result, a));
+  }
+
+  return (result.xy);
+}
+
+[maxvertexcount(3)]
+void main(point ModelFormat In[1], inout PointStream<GraftalFormat> Stream, uint PID: SV_PrimitiveID){
+	GraftalFormat v0;
+	
+	//Generate 4 puesdo-random numbers
+	float r1 = rand(PID);
+	float r2 = rand(r1);
+	float r3 = rand(r2);
+
+	//Position stays the same, for now...
+	v0.pos = In[0].pos;
+
+	//Randomize the normal (to an extent)
+	float scale = 0.5;
+	float3 randVec = float3(r1, r2, r3);
+	v0.norm = normalize(In[0].norm + cross(In[0].norm, randVec)*scale);
+
+	//Randomize size
+	v0.size = rand(PID)*0.5+0.5; //Limit from 0.5 to 1
+
+	//Full visibility
+	v0.P = 1.0;
+
+	Stream.Append(v0);	
+}

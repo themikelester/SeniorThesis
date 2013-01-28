@@ -1,0 +1,46 @@
+
+struct PsIn {
+	float4 position: SV_Position;
+	float2 texCoord: TexCoord;
+};
+
+[Vertex shader]
+
+Texture2D terrain;
+
+float4x4 mvp;
+
+PsIn main(uint VertexID: SV_VertexID, uint InstanceID: SV_InstanceID){
+	PsIn Out;
+
+	float4 position;
+
+	int3 tc;
+	tc.x = VertexID & 0xFE;
+	tc.y = (VertexID & 0x1) + InstanceID;
+	tc.z = 0;
+
+	float h = terrain.Load(tc).x;
+
+	float2 xz = (float2) tc.xy;
+
+	position.x = xz.x - 127.5;
+	position.y = 10*h;
+	position.z = xz.y - 127.5;
+	position.w = 1.0;
+
+	Out.position = mul(mvp, position);
+	Out.texCoord = xz * (1.0 / 64.0);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D ground;
+SamplerState filter;
+
+float3 main(PsIn In) : SV_Target {
+	return float4(In.texCoord.xy, 0, 1);
+}

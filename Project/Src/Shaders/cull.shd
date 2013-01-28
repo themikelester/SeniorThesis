@@ -1,0 +1,24 @@
+float3 eyePos;
+float scale;
+
+[Vertex shader]
+GraftalFormat main(GraftalFormat graftal){
+	return graftal;
+}
+
+[Geometry shader]
+
+[maxvertexcount(3)]
+void main(point GraftalFormat In[1], inout PointStream<GraftalFormat> Stream){
+	float3 graftalPos = In[0].pos*scale;
+	float3 eyeVec = normalize(eyePos - graftalPos);
+	float NdotV = dot(In[0].norm, eyeVec);
+
+	In[0].pos = graftalPos;
+	In[0].P = NdotV;
+
+	if(In[0].P < -0.1)
+		return;
+
+	Stream.Append(In[0]);	
+}
