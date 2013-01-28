@@ -33,4 +33,6 @@
 *.vcxproj.filters
 
 # Specific
-Project/Src/Debug/Resources.res
+Project/Src/Debug/*
+Project/Src/GPUGraftals.vcxproj
+Project/Src/GPUGraftals.vcxproj.filters

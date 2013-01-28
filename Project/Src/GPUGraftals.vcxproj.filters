@@ -71,7 +71,6 @@
     <ClCompile Include="..\Framework3\Renderer.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Bunny.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -144,7 +143,6 @@
     <ClInclude Include="Includes.h">
       <Filter>Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Bunny.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.shd">
