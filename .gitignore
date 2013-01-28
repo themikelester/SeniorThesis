@@ -1,5 +1,6 @@
 # Object files
 *.o
+*.obj
 
 # Libraries
 *.lib
@@ -15,3 +16,21 @@
 *.exe
 *.out
 *.app
+
+# Debug
+*.pdb
+*.tlog
+*.log
+
+# Visual Studio
+*.manifest
+*.idb
+*.opensdf
+*.sdf
+*.suo
+*.ilk
+*.vcxproj
+*.vcxproj.filters
+
+# Specific
+Project/Src/Debug/Resources.res
